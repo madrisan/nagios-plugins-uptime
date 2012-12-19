@@ -1,5 +1,5 @@
 PACKAGE = nagios-plugins-linux-uptime
-VERSION = 0
+VERSION = 2
 DISTDIR = $(PACKAGE)-$(VERSION)
 DIST_ARCHIVE = $(DISTDIR).tar.bz2
 
