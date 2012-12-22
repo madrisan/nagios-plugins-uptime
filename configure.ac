@@ -7,7 +7,7 @@ m4_define(PROG_BUGREPORT, [davide.madrisan@gmail.com])
 AC_INIT([PROG_NAME],[PROG_VERSION],[PROG_BUGREPORT],[PROG_NAME])
 AC_PREREQ([2.59])
 AC_CONFIG_SRCDIR([src/check_uptime.c])
-AM_INIT_AUTOMAKE([gnu])
+AM_INIT_AUTOMAKE([gnu dist-bzip2])
 AC_CONFIG_HEADERS(config.h:config.hin)
 
 AM_MAINTAINER_MODE
