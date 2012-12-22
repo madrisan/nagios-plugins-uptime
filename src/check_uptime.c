@@ -27,6 +27,7 @@
 #include <unistd.h>
 #include <utmp.h>
 
+#include "config.h"
 #include "nputils.h"
 
 #define PROGRAM_NAME "check_uptime"
