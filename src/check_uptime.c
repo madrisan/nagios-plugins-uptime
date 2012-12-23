@@ -30,9 +30,6 @@
 #include "config.h"
 #include "nputils.h"
 
-#define PROGRAM_NAME "check_uptime"
-#define PROGRAM_VERSION "2"
-
 #if !defined(restrict) && __STDC_VERSION__ < 199901
 #if __GNUC__ > 2 || __GNUC_MINOR__ >= 92
 #define restrict __restrict__
@@ -69,7 +66,7 @@ char *sprint_uptime (double);
 
 static void __attribute__ ((__noreturn__)) print_version (void)
 {
-  puts (PROGRAM_NAME " version " PROGRAM_VERSION);
+  puts (PACKAGE_NAME " version " PACKAGE_VERSION);
   exit (STATE_OK);
 }
 
@@ -83,14 +80,14 @@ static const struct option longopts[] = {
 
 static void __attribute__ ((__noreturn__)) usage (FILE * out)
 {
-  fputs (PROGRAM_NAME " ver." PROGRAM_VERSION " - \
+  fputs (PACKAGE_NAME " ver." PACKAGE_VERSION " - \
 check the time the server is running\n\
-Copyright (C) 2012 Davide Madrisan <davide.madrisan@gmail.com>\n", out);
+Copyright (C) 2012 Davide Madrisan <" PACKAGE_BUGREPORT ">\n", out);
   fputs ("\n\
   Usage:\n\
-\t" PROGRAM_NAME " [--warning [@]start:end] [--critical [@]start:end]\n\
-\t" PROGRAM_NAME " --help\n\
-\t" PROGRAM_NAME " --version\n\n", out);
+\t" PACKAGE_NAME " [--warning [@]start:end] [--critical [@]start:end]\n\
+\t" PACKAGE_NAME " --help\n\
+\t" PACKAGE_NAME " --version\n\n", out);
   fputs ("\
   Where:\n\
 \t1. start <= end\n\
@@ -100,8 +97,8 @@ Copyright (C) 2012 Davide Madrisan <davide.madrisan@gmail.com>\n", out);
 \t5. alert is raised if metric is outside start and end range (inclusive of endpoints)\n\
 \t6. if range starts with \"@\", then alert if inside this range (inclusive of endpoints)\n\n", out);
   fputs ("\
-  Examples:\n\t" PROGRAM_NAME "\n\
-\t" PROGRAM_NAME " --warning 30: --critical 15:\n\n", out);
+  Examples:\n\t" PACKAGE_NAME "\n\
+\t" PACKAGE_NAME " --warning 30: --critical 15:\n\n", out);
 
   exit (out == stderr ? STATE_UNKNOWN : STATE_OK);
 }
