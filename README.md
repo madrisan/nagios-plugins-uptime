@@ -1,27 +1,55 @@
+# nagios-plugins-linux-uptime
 
-                          nagios-plugins-linux-uptime
+This Nagios plugin checks the time the server is running.
 
-                     Check the time the server is running.
+Usage
+
+	nagios-plugins-linux-uptime [--warning [@]start:end] [--critical [@]start:end]
+	nagios-plugins-linux-uptime --help
+	nagios-plugins-linux-uptime --version
+
+Where:
+
+* start <= end
+* start and ":" is not required if start=0
+* if range is of format "start:" and end is not specified, assume end is infinity
+* to specify negative infinity, use "~"
+* alert is raised if metric is outside start and end range (inclusive of endpoints)
+* if range starts with "@", then alert if inside this range (inclusive of endpoints)
 
 
-WEB PAGE:
+## Examples:
 
-      https://sites.google.com/site/davidemadrisan/opensource
-
-
-SOURCE CODE:
-
-      Github
-          https://github.com/madrisan/nagios-plugins-linux-uptime
-
-      Checkout:
-          git clone https://github.com/madrisan/nagios-plugins-linux-uptime
+	nagios-plugins-linux-uptime
+	nagios-plugins-linux-uptime --warning 30: --critical 15:
 
 
-COMPILATION:
+## Source code
 
-      make
+The source code can be also found at https://sites.google.com/site/davidemadrisan/opensource
 
-      # and as root:
-      make install NAGIOSPLUGINDIR=/path/of/nagios/plugins
+
+## Installation
+
+This package uses GNU autotools for configuration and installation.
+
+If you have cloned the git repository then you will need to run
+`autogen.sh` to generate the required files.
+
+Run `./configure --help` to see a list of available install options.
+The plugin will be installed by default into `LIBEXECDIR`.
+
+It is highly likely that you will want to customise this location to
+suit your needs, i.e.:
+
+	./configure --libexecdir=/usr/lib/nagios/plugins
+
+After `./configure` has completed successfully run `make install` and
+you're done!
+
+
+## Bugs
+
+If you find a bug please create an issue in the project bug tracker at
+https://github.com/madrisan/nagios-plugins-linux-filesystems/issues
 
