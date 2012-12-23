@@ -8,7 +8,7 @@ Usage
 	nagios-plugins-linux-uptime --help
 	nagios-plugins-linux-uptime --version
 
-Where:
+Where
 
 * start <= end
 * start and ":" is not required if start=0
@@ -17,8 +17,7 @@ Where:
 * alert is raised if metric is outside start and end range (inclusive of endpoints)
 * if range starts with "@", then alert if inside this range (inclusive of endpoints)
 
-
-## Examples:
+Examples
 
 	nagios-plugins-linux-uptime
 	nagios-plugins-linux-uptime --warning 30: --critical 15:
