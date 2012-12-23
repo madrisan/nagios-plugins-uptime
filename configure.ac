@@ -20,7 +20,7 @@ AC_PROG_GCC_TRADITIONAL
 dnl Checks for header files
 AC_HEADER_STDC
 
-#AC_PREFIX_DEFAULT(/usr/local/nagios)
+AC_PREFIX_DEFAULT(/usr/local/nagios)
 
 #AC_C_PROTOTYPES
 #AC_C_CONST
