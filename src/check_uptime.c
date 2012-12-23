@@ -25,7 +25,6 @@
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
-#include <utmp.h>
 
 #include "config.h"
 #include "nputils.h"
