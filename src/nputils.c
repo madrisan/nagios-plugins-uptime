@@ -26,6 +26,7 @@
 
 #include "nputils.h"
 
+int check_range (double, range *);
 range *parse_range_string (char *);
 void set_range_start (range *, double);
 void set_range_end (range *, double);
