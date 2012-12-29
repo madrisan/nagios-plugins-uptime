@@ -192,6 +192,6 @@ main (int argc, char **argv)
   status = get_status (uptime_mins, my_threshold);
   free (my_threshold);
 
-  printf ("Uptime: %s\n", sprint_uptime (uptime_secs));
+  printf ("Uptime: %s;| uptime=%d\n", sprint_uptime (uptime_secs), uptime_mins);
   return status;
 }
