@@ -49,6 +49,19 @@ After `./configure` has completed successfully run `make install` and you're
 done!
 
 
+## Supported Platforms
+
+This package is written in plain C, making as few assumptions as possible, and
+sticking closely to ANSI C/POSIX.
+
+This is a list of platforms this nagios plugin is known to compile and run on
+
+        Linux with kernel 3.6 and glibc 2.16.0 (openmamba milestone 2.75.0)
+        FreeBSD 8.2-RELEASE-p10
+
+Thanks to shellmix.com for providing a free FreeBSD shell account.
+
+
 ## Bugs
 
 If you find a bug please create an issue in the project bug tracker at
