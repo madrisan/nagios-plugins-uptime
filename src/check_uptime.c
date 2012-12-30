@@ -18,6 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "config.h"
+
 #include <fcntl.h>
 #include <getopt.h>
 #include <locale.h>
@@ -26,7 +28,6 @@
 #include <time.h>
 #include <unistd.h>
 
-#include "config.h"
 #include "nputils.h"
 
 #if !defined(restrict) && __STDC_VERSION__ < 199901
@@ -37,7 +38,9 @@
 #endif
 #endif
 
-static char buf[128];
+#define BUFSIZE 127
+static char buf[BUFSIZE + 1];
+static char result_line[BUFSIZE + 1], perfdata_line[BUFSIZE + 1];
 
 int uptime (double *restrict, double *restrict);
 char *sprint_uptime (double);
@@ -184,14 +187,41 @@ main (int argc, char **argv)
 
   status = set_thresholds (&my_threshold, warning, critical);
   if (status == NP_RANGE_UNPARSEABLE)
-     usage (stderr);
+    usage (stderr);
 
-  uptime (&uptime_secs, &idle_secs);
-  uptime_mins = (int) uptime_secs / 60;
+  if (0 != uptime (&uptime_secs, &idle_secs))
+    {
+      uptime_mins = (int) uptime_secs / 60;
+      status = get_status (uptime_mins, my_threshold);
+      free (my_threshold);
+    }
+  else
+    status = STATE_UNKNOWN;
 
-  status = get_status (uptime_mins, my_threshold);
-  free (my_threshold);
+  switch (status)
+    {
+    default:
+      c = snprintf (result_line, BUFSIZE,
+		    "UPTIME UNKNOWN: can't get system uptime counter");
+      break;
+    case STATE_CRITICAL:
+      c = snprintf (result_line, BUFSIZE, "UPTIME CRITICAL:");
+      break;
+    case STATE_WARNING:
+      c = snprintf (result_line, BUFSIZE, "UPTIME WARNING:");
+      break;
+    case STATE_OK:
+      c = snprintf (result_line, BUFSIZE, "UPTIME OK:");
+      break;
+    }
 
-  printf ("Uptime: %s;| uptime=%d\n", sprint_uptime (uptime_secs), uptime_mins);
+  if (status != STATE_UNKNOWN)
+    {
+      snprintf (result_line + c, BUFSIZE - c, " %s",
+		sprint_uptime (uptime_secs));
+      snprintf (perfdata_line, BUFSIZE, "uptime=%d", uptime_mins);
+    }
+
+  printf ("%s|%s\n", result_line, perfdata_line);
   return status;
 }
