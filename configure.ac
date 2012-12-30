@@ -55,6 +55,40 @@ AC_DEFUN([AC_STRUCT_SYSINFO_UPTIME],
    ])
 AC_STRUCT_SYSINFO_UPTIME
 
+dnl Check for function sysctl (KERN_BOOTTIME)
+AC_CHECK_HEADERS([sys/types.h sys/param.h])
+
+AC_MSG_CHECKING(for function sysctl (KERN_BOOTTIME))
+AC_COMPILE_IFELSE(
+  [AC_LANG_PROGRAM([[
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif /* HAVE_SYS_TYPES_H */
+
+#ifdef HAVE_SYS_PARAM_H
+#include <sys/param.h>
+#endif /* HAVE_SYS_PARAM_H */ 
+
+#include <sys/sysctl.h>
+#include <unistd.h>
+#include <time.h>
+   ]],[[
+size_t len;
+struct timeval uptime;
+int mib[2];
+
+mib[0] = CTL_KERN;
+mib[1] = KERN_BOOTTIME;
+
+len = sizeof(uptime);
+sysctl(mib, 2, &uptime, &len, 0, 0);]])],
+  [ac_cv_function_sysctl_kern_boottime=yes
+   AC_DEFINE_UNQUOTED(HAVE_FUNCTION_SYSCTL_KERN_BOOTTIME, 1,
+     [Define to 1 if 'KERN_BOOTTIME' exists.])
+  ],
+  [ac_cv_function_sysctl_kern_boottime=no])
+AC_MSG_RESULT([$ac_cv_function_sysctl_kern_boottime])
+
 AC_PREFIX_DEFAULT(/usr/local/nagios)
 
 dnl Checks for typedefs, structures, and compiler characteristics.

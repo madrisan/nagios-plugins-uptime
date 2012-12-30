@@ -31,6 +31,14 @@
 #include <time.h>
 #include <unistd.h>
 
+#ifdef HAVE_SYS_PARAM_H
+#include <sys/param.h>
+#endif
+#include <sys/sysctl.h>
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+
 #include "nputils.h"
 
 #if !defined(restrict) && __STDC_VERSION__ < 199901
@@ -111,7 +119,8 @@ Copyright (C) 2012 Davide Madrisan <" PACKAGE_BUGREPORT ">\n", out);
 int
 uptime (double *restrict uptime_secs)
 {
-#if HAVE_STRUCT_SYSINFO_WITH_UPTIME
+#if defined(HAVE_STRUCT_SYSINFO_WITH_UPTIME)
+
   struct sysinfo info;
 
   if (0 != sysinfo (&info))
@@ -123,7 +132,29 @@ uptime (double *restrict uptime_secs)
 
   return info.uptime;		/* assume never be zero seconds in
 				 * practice */
+
+#elif defined(HAVE_FUNCTION_SYSCTL_KERN_BOOTTIME)
+
+  int mib[2], now;
+  size_t len;
+  struct timeval system_uptime;
+
+  mib[0] = CTL_KERN;
+  mib[1] = KERN_BOOTTIME;
+
+  len = sizeof(system_uptime);
+
+  if (0 != sysctl(mib, 2, &system_uptime, &len, NULL, 0))
+    return 0;
+
+  now = time(NULL);
+
+  SET_IF_DESIRED (uptime_secs, now - system_uptime.tv_sec);
+
+  return (now - system_uptime.tv_sec);
+
 #else
+
   double up = 0, idle = 0;
   char *restrict savelocale;
   int uptime_fd = -1;
