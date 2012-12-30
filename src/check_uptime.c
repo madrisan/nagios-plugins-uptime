@@ -25,6 +25,9 @@
 #include <locale.h>
 #include <stdio.h>
 #include <stdlib.h>
+#if HAVE_SYS_SYSINFO_H
+#include <sys/sysinfo.h>
+#endif
 #include <time.h>
 #include <unistd.h>
 
@@ -42,7 +45,7 @@
 static char buf[BUFSIZE + 1];
 static char result_line[BUFSIZE + 1], perfdata_line[BUFSIZE + 1];
 
-int uptime (double *restrict, double *restrict);
+int uptime (double *restrict);
 char *sprint_uptime (double);
 
 #define BAD_OPEN_MESSAGE  "Error: /proc must be mounted\n"
@@ -106,8 +109,21 @@ Copyright (C) 2012 Davide Madrisan <" PACKAGE_BUGREPORT ">\n", out);
 }
 
 int
-uptime (double *restrict uptime_secs, double *restrict idle_secs)
+uptime (double *restrict uptime_secs)
 {
+#if HAVE_STRUCT_SYSINFO_WITH_UPTIME
+  struct sysinfo info;
+
+  if (0 != sysinfo (&info))
+    {
+      perror ("cannot get the system uptime");
+      return 0;
+    }
+  SET_IF_DESIRED (uptime_secs, info.uptime);
+
+  return info.uptime;		/* assume never be zero seconds in
+				 * practice */
+#else
   double up = 0, idle = 0;
   char *restrict savelocale;
   int uptime_fd = -1;
@@ -123,10 +139,10 @@ uptime (double *restrict uptime_secs, double *restrict idle_secs)
     }
   setlocale (LC_NUMERIC, savelocale);
   SET_IF_DESIRED (uptime_secs, up);
-  SET_IF_DESIRED (idle_secs, idle);
 
   return up;			/* assume never be zero seconds in
 				 * practice */
+#endif
 }
 
 char *
@@ -160,7 +176,7 @@ main (int argc, char **argv)
 {
   int c, uptime_mins, status;
   char *critical = NULL, *warning = NULL;
-  double uptime_secs, idle_secs;
+  double uptime_secs;
   thresholds *my_threshold = NULL;
 
   while ((c = getopt_long (argc, argv, "c:w:hV", longopts, NULL)) != -1)
@@ -189,7 +205,7 @@ main (int argc, char **argv)
   if (status == NP_RANGE_UNPARSEABLE)
     usage (stderr);
 
-  if (0 != uptime (&uptime_secs, &idle_secs))
+  if (0 != uptime (&uptime_secs))
     {
       uptime_mins = (int) uptime_secs / 60;
       status = get_status (uptime_mins, my_threshold);
