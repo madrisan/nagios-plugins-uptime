@@ -25,6 +25,9 @@ AC_PROG_RANLIB
 
 dnl Checks for header files
 AC_HEADER_STDC
+AC_HEADER_TIME
+AC_CHECK_HEADERS(sys/time.h strings.h)
+
 AC_CHECK_HEADERS(getopt.h err.h)
 AC_DEFUN([AC_STRUCT_OPTION_GETOPT_H],
    [AC_MSG_CHECKING([for struct option in getopt])
