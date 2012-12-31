@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 
-m4_define(PROG_VERSION, 2)
-m4_define(PROG_NAME, [nagios-plugins-linux-uptime])
+m4_define(PROG_VERSION, 3)
+m4_define(PROG_NAME, [nagios-plugins-uptime])
 m4_define(PROG_BUGREPORT, [davide.madrisan@gmail.com])
 
 AC_INIT([PROG_NAME],[PROG_VERSION],[PROG_BUGREPORT],[PROG_NAME])
