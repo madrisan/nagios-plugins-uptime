@@ -58,7 +58,7 @@ AC_DEFUN([AC_STRUCT_SYSINFO_UPTIME],
    ])
 AC_STRUCT_SYSINFO_UPTIME
 
-dnl Check for function sysctl (KERN_BOOTTIME)
+dnl Check for function sysctl (KERN_BOOTTIME) - FreeBSD
 AC_CHECK_HEADERS([sys/types.h sys/param.h])
 
 AC_MSG_CHECKING(for function sysctl (KERN_BOOTTIME))
@@ -91,6 +91,9 @@ sysctl(mib, 2, &uptime, &len, 0, 0);]])],
   ],
   [ac_cv_function_sysctl_kern_boottime=no])
 AC_MSG_RESULT([$ac_cv_function_sysctl_kern_boottime])
+
+dnl Check for kstat.h - Solaris
+AC_CHECK_HEADERS([kstat.h])
 
 AC_PREFIX_DEFAULT(/usr/local/nagios)
 

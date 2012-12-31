@@ -22,6 +22,11 @@
 
 #include <fcntl.h>
 #include <getopt.h>
+
+#if HAVE_KSTAT_H
+#include <kstat.h>
+#endif
+
 #include <locale.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -130,6 +135,13 @@ Copyright (C) 2012 Davide Madrisan <" PACKAGE_BUGREPORT ">\n", out);
   exit (out == stderr ? STATE_UNKNOWN : STATE_OK);
 }
 
+/* assume uptime never be zero seconds in practice */
+enum
+{
+  UPTIME_RET_FAIL,
+  UPTIME_RET_OK
+};
+
 int
 uptime (double *restrict uptime_secs)
 {
@@ -140,12 +152,11 @@ uptime (double *restrict uptime_secs)
   if (0 != sysinfo (&info))
     {
       perror ("cannot get the system uptime");
-      return 0;
+      return UPTIME_RET_FAIL;
     }
   SET_IF_DESIRED (uptime_secs, info.uptime);
 
-  return info.uptime;		/* assume never be zero seconds in
-				 * practice */
+  return UPTIME_RET_OK;
 
 #elif defined(HAVE_FUNCTION_SYSCTL_KERN_BOOTTIME)
 
@@ -156,16 +167,51 @@ uptime (double *restrict uptime_secs)
   mib[0] = CTL_KERN;
   mib[1] = KERN_BOOTTIME;
 
-  len = sizeof(system_uptime);
+  len = sizeof (system_uptime);
 
-  if (0 != sysctl(mib, 2, &system_uptime, &len, NULL, 0))
-    return 0;
+  if (0 != sysctl (mib, 2, &system_uptime, &len, NULL, 0))
+    return UPTIME_RET_FAIL;
 
-  now = time(NULL);
+  now = time (NULL);
 
   SET_IF_DESIRED (uptime_secs, now - system_uptime.tv_sec);
 
-  return (now - system_uptime.tv_sec);
+  return UPTIME_RET_OK;
+
+#elif defined(HAVE_KSTAT_H)
+
+  kstat_ctl_t *kc;
+  kstat_t *kp;
+  kstat_named_t *kn;
+
+  long hz;
+  long secs;
+
+  hz = sysconf (_SC_CLK_TCK);
+
+  kc = kstat_open ();
+  if (0 == kc)
+    return UPTIME_RET_FAIL;
+
+  kp = kstat_lookup (kc, "unix", 0, "system_misc");
+  if (0 == kp)
+    {
+      kstat_close (kc);
+      return UPTIME_RET_FAIL;
+    }
+
+  if (-1 == kstat_read (kc, kp, 0))
+    {
+      kstat_close (kc);
+      return UPTIME_RET_FAIL;
+    }
+  kn = (kstat_named_t *) kstat_data_lookup (kp, "clk_intr");
+  secs = kn->value.ul / hz;
+
+  kstat_close (kc);
+
+  SET_IF_DESIRED (uptime_secs, secs);
+  return UPTIME_RET_OK;
 
 #else
 
@@ -180,13 +226,13 @@ uptime (double *restrict uptime_secs)
     {
       setlocale (LC_NUMERIC, savelocale);
       fputs ("bad data in " UPTIME_FILE "\n", stderr);
-      return 0;
+      return UPTIME_RET_FAIL;
     }
   setlocale (LC_NUMERIC, savelocale);
   SET_IF_DESIRED (uptime_secs, up);
 
-  return up;			/* assume never be zero seconds in
-				 * practice */
+  return UPTIME_RET_OK;
+
 #endif
 }
 
@@ -250,7 +296,7 @@ main (int argc, char **argv)
   if (status == NP_RANGE_UNPARSEABLE)
     usage (stderr);
 
-  if (0 != uptime (&uptime_secs))
+  if (UPTIME_RET_OK == uptime (&uptime_secs))
     {
       uptime_mins = (int) uptime_secs / 60;
       status = get_status (uptime_mins, my_threshold);
