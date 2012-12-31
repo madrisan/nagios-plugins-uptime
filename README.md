@@ -1,12 +1,12 @@
-# nagios-plugins-linux-uptime
+# nagios-plugins-uptime
 
 This Nagios plugin checks the time the server is running.
 
 Usage
 
-	nagios-plugins-linux-uptime [--warning [@]start:end] [--critical [@]start:end]
-	nagios-plugins-linux-uptime --help
-	nagios-plugins-linux-uptime --version
+	nagios-plugins-uptime [--warning [@]start:end] [--critical [@]start:end]
+	nagios-plugins-uptime --help
+	nagios-plugins-uptime --version
 
 Where
 
@@ -19,8 +19,8 @@ Where
 
 Examples
 
-	nagios-plugins-linux-uptime
-	nagios-plugins-linux-uptime --warning 30: --critical 15:
+	nagios-plugins-uptime
+	nagios-plugins-uptime --warning 30: --critical 15:
 
 
 ## Source code
@@ -63,5 +63,5 @@ Thanks to shellmix.com for providing a free FreeBSD shell account.
 ## Bugs
 
 If you find a bug please create an issue in the project bug tracker at
-https://github.com/madrisan/nagios-plugins-linux-filesystems/issues
+https://github.com/madrisan/nagios-plugins-uptime/issues
 
