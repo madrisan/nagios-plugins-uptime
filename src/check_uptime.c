@@ -75,8 +75,6 @@ static char result_line[BUFSIZE + 1], perfdata_line[BUFSIZE + 1];
 int uptime (double *restrict);
 char *sprint_uptime (double);
 
-#define SET_IF_DESIRED(x,y) do { if(x) *(x) = (y); } while(0)
-
 static void __attribute__ ((__noreturn__)) print_version (void)
 {
   puts (PACKAGE_NAME " version " PACKAGE_VERSION);
@@ -135,8 +133,8 @@ uptime (double *restrict uptime_secs)
       perror ("cannot get the system uptime");
       return UPTIME_RET_FAIL;
     }
-  SET_IF_DESIRED (uptime_secs, info.uptime);
 
+  *uptime_secs = info.uptime;
   return UPTIME_RET_OK;
 
 #elif defined(HAVE_FUNCTION_SYSCTL_KERN_BOOTTIME)
@@ -155,8 +153,7 @@ uptime (double *restrict uptime_secs)
 
   now = time (NULL);
 
-  SET_IF_DESIRED (uptime_secs, now - system_uptime.tv_sec);
-
+  *uptime_secs = now - system_uptime.tv_sec;
   return UPTIME_RET_OK;
 
 #elif defined(HAVE_KSTAT_H)
@@ -191,7 +188,7 @@ uptime (double *restrict uptime_secs)
 
   kstat_close (kc);
 
-  SET_IF_DESIRED (uptime_secs, secs);
+  *uptime_secs = secs;
   return UPTIME_RET_OK;
 
 #else
