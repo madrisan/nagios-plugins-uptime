@@ -75,25 +75,6 @@ static char result_line[BUFSIZE + 1], perfdata_line[BUFSIZE + 1];
 int uptime (double *restrict);
 char *sprint_uptime (double);
 
-#define BAD_OPEN_MESSAGE  "Error: /proc must be mounted\n"
-#define UPTIME_FILE  "/proc/uptime"
-
-#define FILE_TO_BUF(filename, fd) do {                       \
-    static int local_n;                                      \
-    if (fd == -1 && (fd = open(filename, O_RDONLY)) == -1) { \
-        fputs(BAD_OPEN_MESSAGE, stderr);                     \
-        fflush(NULL);                                        \
-        exit(STATE_UNKNOWN);                                 \
-    }                                                        \
-    lseek(fd, 0L, SEEK_SET);                                 \
-    if ((local_n = read(fd, buf, sizeof buf - 1)) < 0) {     \
-        perror(filename);                                    \
-        fflush(NULL);                                        \
-        exit(STATE_UNKNOWN);                                 \
-    }                                                        \
-    buf[local_n] = '\0';                                     \
-} while(0)
-
 #define SET_IF_DESIRED(x,y) do { if(x) *(x) = (y); } while(0)
 
 static void __attribute__ ((__noreturn__)) print_version (void)
@@ -215,23 +196,7 @@ uptime (double *restrict uptime_secs)
 
 #else
 
-  double up = 0, idle = 0;
-  char *restrict savelocale;
-  int uptime_fd = -1;
-
-  FILE_TO_BUF (UPTIME_FILE, uptime_fd);
-  savelocale = setlocale (LC_NUMERIC, NULL);
-  setlocale (LC_NUMERIC, "C");
-  if (sscanf (buf, "%lf %lf", &up, &idle) < 2)
-    {
-      setlocale (LC_NUMERIC, savelocale);
-      fputs ("bad data in " UPTIME_FILE "\n", stderr);
-      return UPTIME_RET_FAIL;
-    }
-  setlocale (LC_NUMERIC, savelocale);
-  SET_IF_DESIRED (uptime_secs, up);
-
-  return UPTIME_RET_OK;
+  return UPTIME_RET_FAIL;
 
 #endif
 }
