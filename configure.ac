@@ -29,34 +29,28 @@ AC_HEADER_TIME
 AC_CHECK_HEADERS(sys/time.h strings.h)
 
 AC_CHECK_HEADERS(getopt.h err.h)
-AC_DEFUN([AC_STRUCT_OPTION_GETOPT_H],
-   [AC_MSG_CHECKING([for struct option in getopt])
-    AC_COMPILE_IFELSE(
-      [AC_LANG_PROGRAM([[#include <getopt.h>]],
-        [[struct option op; op.name;]])],
-      [ac_cv_struct_option_getopt_h=yes],
-      [ac_cv_struct_option_getopt_h=no])
-    AC_MSG_RESULT([$ac_cv_struct_option_getopt_h])
-   ])
-AC_STRUCT_OPTION_GETOPT_H
+AC_MSG_CHECKING([for struct option in getopt])
+AC_COMPILE_IFELSE(
+  [AC_LANG_PROGRAM([[#include <getopt.h>]],
+    [[struct option op; op.name;]])],
+  [ac_cv_struct_option_getopt_h=yes],
+  [ac_cv_struct_option_getopt_h=no])
+AC_MSG_RESULT([$ac_cv_struct_option_getopt_h])
 
 dnl Check for a sysinfo syscall
 AC_CHECK_HEADERS([sys/sysinfo.h])
-AC_DEFUN([AC_STRUCT_SYSINFO_UPTIME],
-   [AC_MSG_CHECKING([for uptime in struct sysinfo])
-    AC_COMPILE_IFELSE(
-      [AC_LANG_PROGRAM([[#include <sys/sysinfo.h>]],
-        [[struct sysinfo info;
-          sysinfo(&info);
-          printf("Uptime = %d\n",info.uptime);]])],
-      [ac_cv_struct_sysinfo_has_uptime=yes
-       AC_DEFINE_UNQUOTED(HAVE_STRUCT_SYSINFO_WITH_UPTIME, 1,
-         [Define to 1 if you have the member uptime in the struct sysinfo.])
-      ],
-      [ac_cv_struct_sysinfo_has_uptime=no])
-    AC_MSG_RESULT([$ac_cv_struct_sysinfo_has_uptime])
-   ])
-AC_STRUCT_SYSINFO_UPTIME
+AC_MSG_CHECKING([for uptime in struct sysinfo])
+AC_COMPILE_IFELSE(
+  [AC_LANG_PROGRAM([[#include <sys/sysinfo.h>]],
+    [[struct sysinfo info;
+      sysinfo(&info);
+      printf("Uptime = %d\n",info.uptime);]])],
+  [ac_cv_struct_sysinfo_has_uptime=yes
+   AC_DEFINE_UNQUOTED(HAVE_STRUCT_SYSINFO_WITH_UPTIME, 1,
+     [Define to 1 if you have the member uptime in the struct sysinfo.])
+  ],
+  [ac_cv_struct_sysinfo_has_uptime=no])
+AC_MSG_RESULT([$ac_cv_struct_sysinfo_has_uptime])
 
 dnl Check for function sysctl (KERN_BOOTTIME) - FreeBSD
 AC_CHECK_HEADERS([sys/types.h sys/param.h])
