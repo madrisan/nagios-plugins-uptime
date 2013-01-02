@@ -35,6 +35,7 @@
 #ifdef HAVE_ERR_H
 #include <err.h>
 #else
+#include <stdio.h>
 #define warnx printf
 #endif
 #include <errno.h>

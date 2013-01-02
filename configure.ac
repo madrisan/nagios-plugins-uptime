@@ -1,6 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 
-m4_define(PROG_VERSION, 3)
+m4_define(PROG_VERSION, 4)
 m4_define(PROG_NAME, [nagios-plugins-uptime])
 m4_define(PROG_BUGREPORT, [davide.madrisan@gmail.com])
 
@@ -26,7 +26,7 @@ AC_PROG_RANLIB
 dnl Checks for header files
 AC_HEADER_STDC
 AC_HEADER_TIME
-AC_CHECK_HEADERS(sys/time.h strings.h)
+AC_CHECK_HEADERS(sys/sysctl.h sys/time.h strings.h)
 
 AC_CHECK_HEADERS(getopt.h err.h)
 AC_MSG_CHECKING([for struct option in getopt])
@@ -88,6 +88,11 @@ AC_MSG_RESULT([$ac_cv_function_sysctl_kern_boottime])
 
 dnl Check for kstat.h - Solaris
 AC_CHECK_HEADERS([kstat.h])
+
+dnl Check for libperfstat.h - AIX
+AC_SEARCH_LIBS(perfstat_memory_total, perfstat, 
+  [AC_DEFINE([HAVE_LIBPERFSTAT], 1,
+     [Define to 1 if you have the 'libperfstat' library (-lperfstat)])])
 
 AC_PREFIX_DEFAULT(/usr/local/nagios)
 

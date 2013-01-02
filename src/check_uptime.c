@@ -20,11 +20,21 @@
 
 #include "config.h"
 
+#include <assert.h>
 #include <fcntl.h>
+#if HAVE_GETOPT_H
 #include <getopt.h>
+#else
+#include <compat_getopt.h>
+#endif
 
 #if HAVE_KSTAT_H
 #include <kstat.h>
+#endif
+
+#if HAVE_LIBPERFSTAT
+#include <sys/protosw.h>
+#include <libperfstat.h>
 #endif
 
 #include <locale.h>
@@ -52,7 +62,9 @@
 #include <sys/param.h>
 #endif
 
+#if HAVE_SYS_SYSCTL_H
 #include <sys/sysctl.h>
+#endif
 
 #ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
@@ -189,6 +201,22 @@ uptime (double *restrict uptime_secs)
   kstat_close (kc);
 
   *uptime_secs = secs;
+  return UPTIME_RET_OK;
+
+#elif defined(HAVE_LIBPERFSTAT)
+
+  long herz = 0;
+  perfstat_cpu_total_t ps_cpu_total;
+
+  herz = sysconf (_SC_CLK_TCK);
+  /* make sure we do not divide by 0 */
+  assert (herz);
+
+  if (-1 ==
+      perfstat_cpu_total (NULL, &ps_cpu_total, sizeof (ps_cpu_total), 1))
+    return UPTIME_RET_FAIL;
+
+  *uptime_secs = ((double) ps_cpu_total.lbolt / herz);
   return UPTIME_RET_OK;
 
 #else
