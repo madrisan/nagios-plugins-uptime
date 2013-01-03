@@ -164,37 +164,31 @@ uptime (double *restrict uptime_secs)
 #elif defined(HAVE_KSTAT_H)
 
   kstat_ctl_t *kc;
-  kstat_t *kp;
-  kstat_named_t *kn;
+  kstat_t *ksp;
+  kstat_named_t *knp;
 
-  long hz;
-  long secs;
+  time_t now;
 
-  hz = sysconf (_SC_CLK_TCK);
-
-  kc = kstat_open ();
-  if (0 == kc)
+  if (NULL == (kc = kstat_open ()))
     return UPTIME_RET_FAIL;
 
-  kp = kstat_lookup (kc, "unix", 0, "system_misc");
-  if (0 == kp)
+  if (NULL != (ksp = kstat_lookup (kc, "unix", 0, "system_misc")))
     {
-      kstat_close (kc);
-      return UPTIME_RET_FAIL;
+      if (-1 == kstat_read (kc, ksp, 0))
+	{
+	  if (NULL !=
+	      (knp = (kstat_named_t *) kstat_data_lookup (ksp, "boot_time")))
+	    {
+	      time (&now);
+	      *uptime_secs = difftime (now, (time_t) knp->value.ul);
+	      kstat_close (kc);
+	      return UPTIME_RET_OK;
+	    }
+	}
     }
-
-  if (-1 == kstat_read (kc, kp, 0))
-    {
-      kstat_close (kc);
-      return UPTIME_RET_FAIL;
-    }
-  kn = (kstat_named_t *) kstat_data_lookup (kp, "clk_intr");
-  secs = kn->value.ul / hz;
 
   kstat_close (kc);
-
-  *uptime_secs = secs;
-  return UPTIME_RET_OK;
+  return UPTIME_RET_FAIL;
 
 #elif defined(HAVE_LIBPERFSTAT)
 
