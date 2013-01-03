@@ -4,9 +4,9 @@ This Nagios plugin checks the time the server is running.
 
 Usage
 
-	nagios-plugins-uptime [--warning [@]start:end] [--critical [@]start:end]
-	nagios-plugins-uptime --help
-	nagios-plugins-uptime --version
+	check_uptime [--warning [@]start:end] [--critical [@]start:end]
+	check_uptime --help
+	check_uptime --version
 
 Where
 
@@ -19,8 +19,8 @@ Where
 
 Examples
 
-	nagios-plugins-uptime
-	nagios-plugins-uptime --warning 30: --critical 15:
+	check_uptime
+	check_uptime --warning 30: --critical 15:
 
 
 ## Source code
