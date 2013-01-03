@@ -151,21 +151,14 @@ uptime (double *restrict uptime_secs)
 
 #elif defined(HAVE_FUNCTION_SYSCTL_KERN_BOOTTIME)
 
-  int mib[2], now;
-  size_t len;
+  int mib[] = { CTL_KERN, KERN_BOOTTIME };
   struct timeval system_uptime;
-
-  mib[0] = CTL_KERN;
-  mib[1] = KERN_BOOTTIME;
-
-  len = sizeof (system_uptime);
+  size_t len = sizeof (system_uptime);
 
   if (0 != sysctl (mib, 2, &system_uptime, &len, NULL, 0))
     return UPTIME_RET_FAIL;
 
-  now = time (NULL);
-
-  *uptime_secs = now - system_uptime.tv_sec;
+  *uptime_secs = time (NULL) - system_uptime.tv_sec;
   return UPTIME_RET_OK;
 
 #elif defined(HAVE_KSTAT_H)
