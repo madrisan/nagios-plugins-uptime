@@ -86,8 +86,11 @@ sysctl(mib, 2, &uptime, &len, 0, 0);]])],
   [ac_cv_function_sysctl_kern_boottime=no])
 AC_MSG_RESULT([$ac_cv_function_sysctl_kern_boottime])
 
-dnl Check for kstat.h - Solaris
-AC_CHECK_HEADERS([kstat.h])
+dnl Check for kstat.h and libkstat - Solaris
+AC_CHECK_HEADERS([kstat.h],
+  [AC_SEARCH_LIBS(kstat, kstat_open,
+     [AC_DEFINE([HAVE_LIBKSTAT], 1,
+        [Define to 1 if you have the 'libkstat' library (-lkstat)])])])
 
 dnl Check for libperfstat.h - AIX
 AC_SEARCH_LIBS(perfstat_memory_total, perfstat, 
