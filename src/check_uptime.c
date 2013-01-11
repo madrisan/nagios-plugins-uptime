@@ -173,7 +173,7 @@ uptime (double *restrict uptime_secs)
 
   if (NULL != (ksp = kstat_lookup (kc, "unix", 0, "system_misc")))
     {
-      if (-1 == kstat_read (kc, ksp, 0))
+      if (-1 != kstat_read (kc, ksp, 0))
 	{
 	  if (NULL !=
 	      (knp = (kstat_named_t *) kstat_data_lookup (ksp, "boot_time")))

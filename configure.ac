@@ -88,7 +88,7 @@ AC_MSG_RESULT([$ac_cv_function_sysctl_kern_boottime])
 
 dnl Check for kstat.h and libkstat - Solaris
 AC_CHECK_HEADERS([kstat.h],
-  [AC_SEARCH_LIBS(kstat, kstat_open,
+  [AC_SEARCH_LIBS(kstat_open, kstat,
      [AC_DEFINE([HAVE_LIBKSTAT], 1,
         [Define to 1 if you have the 'libkstat' library (-lkstat)])])])
 

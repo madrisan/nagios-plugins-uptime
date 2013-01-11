@@ -57,6 +57,7 @@ This is a list of platforms this nagios plugin is known to compile and run on
 * Linux with kernel 3.6 and glibc 2.16.0 (openmamba milestone 2.75.0)
 * FreeBSD 8.2-RELEASE-p10
 * AIX 6.1 with gcc 4.2.0
+* Solaris 11.1 (SunOS solaris 5.11 11.1) with gcc 4.5.2
 
 Thanks to shellmix.com for providing a free FreeBSD shell account.
 
