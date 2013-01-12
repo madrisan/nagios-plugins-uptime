@@ -93,10 +93,10 @@ static void __attribute__ ((__noreturn__)) print_version (void)
 }
 
 static const struct option longopts[] = {
-  {"critical", 1, 0, 'c'},
-  {"warning", 1, 0, 'w'},
-  {"help", 0, 0, 'h'},
-  {"version", 0, 0, 'V'},
+  {(char *) "critical", 1, 0, 'c'},
+  {(char *) "warning", 1, 0, 'w'},
+  {(char *) "help", 0, 0, 'h'},
+  {(char *) "version", 0, 0, 'V'},
   {NULL, 0, 0, 0}
 };
 
@@ -171,12 +171,12 @@ uptime (double *restrict uptime_secs)
   if (NULL == (kc = kstat_open ()))
     return UPTIME_RET_FAIL;
 
-  if (NULL != (ksp = kstat_lookup (kc, "unix", 0, "system_misc")))
+  if (NULL !=
+      (ksp = kstat_lookup (kc, (char *) "unix", 0, (char *) "system_misc")))
     {
       if (-1 != kstat_read (kc, ksp, 0))
 	{
-	  if (NULL !=
-	      (knp = (kstat_named_t *) kstat_data_lookup (ksp, "boot_time")))
+	  if (NULL != (knp = kstat_data_lookup (ksp, (char *) "boot_time")))
 	    {
 	      time (&now);
 	      *uptime_secs = difftime (now, (time_t) knp->value.ul);
