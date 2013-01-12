@@ -1,6 +1,6 @@
 /*
  * License: GPL
- * Copyright (c) 2010,2012 Davide Madrisan <davide.madrisan@gmail.com>
+ * Copyright (c) 2010,2012,2013 Davide Madrisan <davide.madrisan@gmail.com>
  *
  * A Nagios plugin to check the time the server is running
  *
@@ -104,7 +104,7 @@ static void __attribute__ ((__noreturn__)) usage (FILE * out)
 {
   fputs (PACKAGE_NAME " ver." PACKAGE_VERSION " - \
 check the time the server is running\n\
-Copyright (C) 2012 Davide Madrisan <" PACKAGE_BUGREPORT ">\n", out);
+Copyright (C) 2010,2012-2013 Davide Madrisan <" PACKAGE_BUGREPORT ">\n", out);
   fputs ("\n\
   Usage:\n\
 \t" PACKAGE_NAME " [--warning [@]start:end] [--critical [@]start:end]\n\

@@ -1,0 +1,29 @@
+
+    Major changes between "nagios-plugins-uptime" versions 4 and 5
+
+* Add support for Solaris 11 x86 (SunOS solaris 5.11 11.1, gcc 4.5.2).
+
+======================================================================
+
+    Major changes between "nagios-plugins-uptime" versions 3 and 4
+
+* Add support for AIX (6.1 with gcc 4.2.0).
+
+======================================================================
+
+    Major changes between "nagios-plugins-uptime" versions 2 and 3
+
+* The plugin "nagios-plugins-linux-uptime" has been renamed to
+  "nagios-plugins-uptime".
+* Add support for FreeBSDi (8.2-RELEASE-p10).
+* Add perfdata to the plugin output.
+* Update package documentation.
+
+======================================================================
+
+ Major changes between "nagios-plugins-linux-uptime" versions 1 and 2
+
+* Autotoolize package build.
+* Enable more compiler warnings when using gcc.
+
+======================================================================
