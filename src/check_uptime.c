@@ -71,19 +71,11 @@
 
 #include "nputils.h"
 
-#if !defined(restrict) && __STDC_VERSION__ < 199901
-#if __GNUC__ > 2 || __GNUC_MINOR__ >= 92
-#define restrict __restrict__
-#else
-#define restrict
-#endif
-#endif
-
 #define BUFSIZE 127
 static char buf[BUFSIZE + 1];
 static char result_line[BUFSIZE + 1], perfdata_line[BUFSIZE + 1];
 
-int uptime (double *restrict);
+double uptime (void);
 char *sprint_uptime (double);
 
 static void __attribute__ ((__noreturn__)) print_version (void)
@@ -92,12 +84,12 @@ static void __attribute__ ((__noreturn__)) print_version (void)
   exit (STATE_OK);
 }
 
-static const struct option longopts[] = {
-  {(char *) "critical", 1, 0, 'c'},
-  {(char *) "warning", 1, 0, 'w'},
-  {(char *) "help", 0, 0, 'h'},
-  {(char *) "version", 0, 0, 'V'},
-  {NULL, 0, 0, 0}
+static struct option const longopts[] = {
+  {(char *) "critical", required_argument, NULL, 'c'},
+  {(char *) "warning", required_argument, NULL, 'w'},
+  {(char *) "help", no_argument, NULL, 'h'},
+  {(char *) "version", no_argument, NULL, 'V'},
+  {NULL, 0, NULL, 0}
 };
 
 static void __attribute__ ((__noreturn__)) usage (FILE * out)
@@ -126,16 +118,12 @@ Copyright (C) 2010,2012-2013 Davide Madrisan <" PACKAGE_BUGREPORT ">\n", out);
 }
 
 /* assume uptime never be zero seconds in practice */
-enum
-{
-  UPTIME_RET_FAIL,
-  UPTIME_RET_OK
-};
+#define UPTIME_RET_FAIL  0
 
-int
-uptime (double *restrict uptime_secs)
+double
+uptime ()
 {
-#if defined(HAVE_STRUCT_SYSINFO_WITH_UPTIME)
+#if defined(HAVE_STRUCT_SYSINFO_WITH_UPTIME)	/* Linux */
 
   struct sysinfo info;
 
@@ -145,10 +133,9 @@ uptime (double *restrict uptime_secs)
       return UPTIME_RET_FAIL;
     }
 
-  *uptime_secs = info.uptime;
-  return UPTIME_RET_OK;
+  return info.uptime;
 
-#elif defined(HAVE_FUNCTION_SYSCTL_KERN_BOOTTIME)
+#elif defined(HAVE_FUNCTION_SYSCTL_KERN_BOOTTIME)	/* FreeBSD */
 
   int mib[] = { CTL_KERN, KERN_BOOTTIME };
   struct timeval system_uptime;
@@ -157,10 +144,9 @@ uptime (double *restrict uptime_secs)
   if (0 != sysctl (mib, 2, &system_uptime, &len, NULL, 0))
     return UPTIME_RET_FAIL;
 
-  *uptime_secs = time (NULL) - system_uptime.tv_sec;
-  return UPTIME_RET_OK;
+  return (time (NULL) - system_uptime.tv_sec);
 
-#elif defined(HAVE_KSTAT_H)
+#elif defined(HAVE_KSTAT_H)	/* Solaris */
 
   kstat_ctl_t *kc;
   kstat_t *ksp;
@@ -179,9 +165,8 @@ uptime (double *restrict uptime_secs)
 	  if (NULL != (knp = kstat_data_lookup (ksp, (char *) "boot_time")))
 	    {
 	      time (&now);
-	      *uptime_secs = difftime (now, (time_t) knp->value.ul);
 	      kstat_close (kc);
-	      return UPTIME_RET_OK;
+	      return (difftime (now, (time_t) knp->value.ul));
 	    }
 	}
     }
@@ -189,7 +174,7 @@ uptime (double *restrict uptime_secs)
   kstat_close (kc);
   return UPTIME_RET_FAIL;
 
-#elif defined(HAVE_LIBPERFSTAT)
+#elif defined(HAVE_LIBPERFSTAT)	/* AIX */
 
   long herz = 0;
   perfstat_cpu_total_t ps_cpu_total;
@@ -202,8 +187,7 @@ uptime (double *restrict uptime_secs)
       perfstat_cpu_total (NULL, &ps_cpu_total, sizeof (ps_cpu_total), 1))
     return UPTIME_RET_FAIL;
 
-  *uptime_secs = ((double) ps_cpu_total.lbolt / herz);
-  return UPTIME_RET_OK;
+  return ((double) ps_cpu_total.lbolt / herz);
 
 #else
 
@@ -272,39 +256,37 @@ main (int argc, char **argv)
   if (status == NP_RANGE_UNPARSEABLE)
     usage (stderr);
 
-  if (UPTIME_RET_OK == uptime (&uptime_secs))
+  if (UPTIME_RET_FAIL != (uptime_secs = uptime ()))
     {
       uptime_mins = (int) uptime_secs / 60;
       status = get_status (uptime_mins, my_threshold);
       free (my_threshold);
-    }
-  else
-    status = STATE_UNKNOWN;
 
-  switch (status)
-    {
-    default:
-      c = snprintf (result_line, BUFSIZE,
-		    "UPTIME UNKNOWN: can't get system uptime counter");
-      break;
-    case STATE_CRITICAL:
-      c = snprintf (result_line, BUFSIZE, "UPTIME CRITICAL:");
-      break;
-    case STATE_WARNING:
-      c = snprintf (result_line, BUFSIZE, "UPTIME WARNING:");
-      break;
-    case STATE_OK:
-      c = snprintf (result_line, BUFSIZE, "UPTIME OK:");
-      break;
-    }
+      switch (status)
+	{
+	case STATE_CRITICAL:
+	  c = snprintf (result_line, BUFSIZE, "UPTIME CRITICAL:");
+	  break;
+	case STATE_WARNING:
+	  c = snprintf (result_line, BUFSIZE, "UPTIME WARNING:");
+	  break;
+	case STATE_OK:
+	  c = snprintf (result_line, BUFSIZE, "UPTIME OK:");
+	  break;
+	}
 
-  if (status != STATE_UNKNOWN)
-    {
       snprintf (result_line + c, BUFSIZE - c, " %s",
 		sprint_uptime (uptime_secs));
       snprintf (perfdata_line, BUFSIZE, "uptime=%d", uptime_mins);
+
+      printf ("%s|%s\n", result_line, perfdata_line);
+    }
+  else
+    {
+      c = snprintf (result_line, BUFSIZE,
+		    "UPTIME UNKNOWN: can't get system uptime counter");
+      status = STATE_UNKNOWN;
     }
 
-  printf ("%s|%s\n", result_line, perfdata_line);
   return status;
 }
