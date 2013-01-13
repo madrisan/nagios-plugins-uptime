@@ -1,2 +1,1 @@
-* Add perfdata to the output + the option '--noperfdata'
-* Porting this plugin to other unixes
+* Port to other UNIXes or other compilers.
