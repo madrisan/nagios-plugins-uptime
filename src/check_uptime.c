@@ -2,7 +2,7 @@
  * License: GPL
  * Copyright (c) 2010,2012,2013 Davide Madrisan <davide.madrisan@gmail.com>
  *
- * A Nagios plugin to check the time the server is running
+ * A Nagios plugin to check how long the system has been running
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -95,7 +95,7 @@ static struct option const longopts[] = {
 static void __attribute__ ((__noreturn__)) usage (FILE * out)
 {
   fputs (PACKAGE_NAME " ver." PACKAGE_VERSION " - \
-check the time the server is running\n\
+check how long the system has been running\n\
 Copyright (C) 2010,2012-2013 Davide Madrisan <" PACKAGE_BUGREPORT ">\n", out);
   fputs ("\n\
   Usage:\n\

@@ -1,6 +1,6 @@
 # nagios-plugins-uptime
 
-This Nagios plugin checks the time the server is running.
+This Nagios plugin checks how long the system has been running.
 
 Usage
 
