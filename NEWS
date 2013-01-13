@@ -15,7 +15,7 @@
 
 * The plugin "nagios-plugins-linux-uptime" has been renamed to
   "nagios-plugins-uptime".
-* Add support for FreeBSDi (8.2-RELEASE-p10).
+* Add support for FreeBSD (8.2-RELEASE-p10).
 * Add perfdata to the plugin output.
 * Update package documentation.
 
