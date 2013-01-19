@@ -71,6 +71,11 @@
 
 #include "nputils.h"
 
+static const char *program_name = "check_update";
+static const char *program_version = PACKAGE_VERSION;
+static const char *program_copyright =
+  "Copyright (C) 2010,2012-2013 Davide Madrisan <" PACKAGE_BUGREPORT ">";
+
 #define BUFSIZE 127
 static char buf[BUFSIZE + 1];
 static char result_line[BUFSIZE + 1], perfdata_line[BUFSIZE + 1];
@@ -80,7 +85,13 @@ char *sprint_uptime (double);
 
 static void __attribute__ ((__noreturn__)) print_version (void)
 {
-  puts (PACKAGE_NAME " version " PACKAGE_VERSION);
+  printf ("%s, version %s\n", program_name, program_version);
+  printf ("%s\n", program_copyright);
+  fputs ("\
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\n\n\
+This is free software; you are free to change and redistribute it.\n\
+There is NO WARRANTY, to the extent permitted by law.\n", stdout);
+
   exit (STATE_OK);
 }
 
@@ -94,25 +105,28 @@ static struct option const longopts[] = {
 
 static void __attribute__ ((__noreturn__)) usage (FILE * out)
 {
-  fputs (PACKAGE_NAME " ver." PACKAGE_VERSION " - \
-check how long the system has been running\n\
-Copyright (C) 2010,2012-2013 Davide Madrisan <" PACKAGE_BUGREPORT ">\n", out);
-  fputs ("\n\
-  Usage:\n\
-\t" PACKAGE_NAME " [--warning [@]start:end] [--critical [@]start:end]\n\
-\t" PACKAGE_NAME " --help\n\
-\t" PACKAGE_NAME " --version\n\n", out);
+  fprintf (out,
+	   "%s, version %s - check how long the system has been running.\n",
+	   program_name, program_version);
+  fprintf (out, "%s\n\n", program_copyright);
+  fprintf (out, "Usage: %s [OPTION]\n\n", program_name);
   fputs ("\
-  Where:\n\
-\t1. start <= end\n\
-\t2. start and \":\" is not required if start=0\n\
-\t3. if range is of format \"start:\" and end is not specified, assume end is infinity\n\
-\t4. to specify negative infinity, use \"~\"\n\
-\t5. alert is raised if metric is outside start and end range (inclusive of endpoints)\n\
-\t6. if range starts with \"@\", then alert if inside this range (inclusive of endpoints)\n\n", out);
+Options:\n\
+  -w, --warning [@]start:end]   warning threshold\n\
+  -c, --critical [@]start:end]   critical threshold\n\
+  -h, --help            display this help and exit\n\
+  -v, --version         output version information and exit\n\n", out);
+
   fputs ("\
-  Examples:\n\t" PACKAGE_NAME "\n\
-\t" PACKAGE_NAME " --warning 30: --critical 15:\n\n", out);
+Where:\n\
+  1. start <= end\n\
+  2. start and \":\" is not required if start=0\n\
+  3. if range is of format \"start:\" and end is not specified, assume end is infinity\n\
+  4. to specify negative infinity, use \"~\"\n\
+  5. alert is raised if metric is outside start and end range (inclusive of endpoints)\n\
+  6. if range starts with \"@\", then alert if inside this range (inclusive of endpoints)\n\n", out);
+  fprintf (out, "Examples:\n  %s\n  %s --warning 30: --critical 15:\n",
+	   program_name, program_name);
 
   exit (out == stderr ? STATE_UNKNOWN : STATE_OK);
 }
