@@ -218,7 +218,8 @@ sprint_uptime (double uptime_secs)
 
   updays = (int) uptime_secs / (60 * 60 * 24);
   if (updays)
-    pos += sprintf (buf, "%d day%s ", updays, (updays != 1) ? "s" : "");
+    pos +=
+      snprintf (buf, BUFSIZE, "%d day%s ", updays, (updays != 1) ? "s" : "");
   upminutes = (int) uptime_secs / 60;
   uphours = upminutes / 60;
   uphours = uphours % 24;
@@ -227,11 +228,11 @@ sprint_uptime (double uptime_secs)
   if (uphours)
     {
       pos +=
-	sprintf (buf + pos, "%d hour%s %d min", uphours,
-		 (uphours != 1) ? "s" : "", upminutes);
+	snprintf (buf + pos, BUFSIZE - pos, "%d hour%s %d min", uphours,
+		  (uphours != 1) ? "s" : "", upminutes);
     }
   else
-    pos += sprintf (buf + pos, "%d min", upminutes);
+    pos += snprintf (buf + pos, BUFSIZE - pos, "%d min", upminutes);
 
   return buf;
 }
