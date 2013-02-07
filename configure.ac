@@ -26,7 +26,16 @@ AC_PROG_RANLIB
 dnl Checks for header files
 AC_HEADER_STDC
 AC_HEADER_TIME
-AC_CHECK_HEADERS(sys/sysctl.h sys/time.h strings.h)
+
+AC_CHECK_HEADERS([sys/param.h])
+# check sys/sysctl.h separately, as it requires other header
+# on at least OpenBSD
+AC_CHECK_HEADERS([sys/sysctl.h], [], [],
+[[#if HAVE_SYS_PARAM_H
+#include <sys/param.h>
+#endif
+]])
+AC_CHECK_HEADERS(sys/time.h strings.h)
 
 AC_CHECK_HEADERS(getopt.h err.h)
 AC_MSG_CHECKING([for struct option in getopt])
