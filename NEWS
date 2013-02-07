@@ -1,3 +1,10 @@
+    Major changes between "nagios-plugins-uptime" versions 5 and 6
+
+* Rework help and version messages.
+* COPYING: update to GPLv3. 
+* Code refactoring.
+
+======================================================================
 
     Major changes between "nagios-plugins-uptime" versions 4 and 5
 
