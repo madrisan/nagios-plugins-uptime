@@ -203,6 +203,16 @@ uptime ()
 
   return ((double) ps_cpu_total.lbolt / herz);
 
+#elif defined(HAVE_CLOCK_GETTIME_MONOTONIC) /* POSIX.1-2001 */
+
+  struct timespec t;
+
+  clock_gettime (CLOCK_MONOTONIC, &t);
+  if (t.tv_sec > 0)
+    return t.tv_sec;
+  else
+    return UPTIME_RET_FAIL;
+
 #else
 
   return UPTIME_RET_FAIL;

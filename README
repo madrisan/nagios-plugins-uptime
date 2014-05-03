@@ -35,7 +35,7 @@ https://sites.google.com/site/davidemadrisan/opensource
 This package uses GNU autotools for configuration and installation.
 
 If you have cloned the git repository then you will need to run `autogen.sh`
-to generate the required files.
+or `autoreconf` (autoconf package) to generate the required files.
 
 Run `./configure --help` to see a list of available install options.
 The plugin will be installed by default into `LIBEXECDIR`.
@@ -54,7 +54,7 @@ done!
 This package is written in plain C, making as few assumptions as possible, and
 sticking closely to ANSI C/POSIX.
 
-This is a list of platforms this nagios plugin is known to compile and run on
+This is a list of platforms this Nagios plugin is known to compile and run on
 
         Linux with kernel 3.6 and glibc 2.16.0 (openmamba milestone 2.75.0)
         FreeBSD 8.2-RELEASE-p10
@@ -62,6 +62,8 @@ This is a list of platforms this nagios plugin is known to compile and run on
         Solaris 11.1 (SunOS solaris 5.11 11.1) with gcc 4.5.2
         OpenBSD 5.2 with gcc 4.2.1
 
+Other Unixes that provide the POSIX function `clock_gettime` are probably supported.
+Please drop me a line if you have found one.
 Thanks to shellmix.com for providing a free FreeBSD shell account.
 
 

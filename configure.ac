@@ -106,6 +106,25 @@ AC_SEARCH_LIBS(perfstat_memory_total, perfstat,
   [AC_DEFINE([HAVE_LIBPERFSTAT], 1,
      [Define to 1 if you have the 'libperfstat' library (-lperfstat)])])
 
+dnl Check for clock_gettime - POSIX
+AC_MSG_CHECKING(for function clock_gettime CLOCK_MONOTONIC)
+AC_COMPILE_IFELSE(
+  [AC_LANG_PROGRAM([[
+#include <time.h>
+   ]],[[
+struct timespec t;
+clock_gettime (CLOCK_MONOTONIC, &t);
+if (t.tv_sec > 0)
+  return t.tv_sec;
+else
+  return -1;]])],
+  [ac_cv_clock_gettime_monotonic=yes
+   AC_DEFINE_UNQUOTED(HAVE_CLOCK_GETTIME_MONOTONIC, 1,
+     [Define to 1 if you have the function clock_gettime CLOCK_MONOTONIC.])
+  ],
+  [ac_cv_clock_gettime_monotonic=no])
+AC_MSG_RESULT([$ac_cv_clock_gettime_monotonic])
+
 AC_PREFIX_DEFAULT(/usr/local/nagios)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
