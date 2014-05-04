@@ -1,3 +1,11 @@
+    Major changes between "nagios-plugins-uptime" versions 7 and 8
+
+* Use the function 'clock_gettime' when available.
+  This should make the plugin working on all the unlisted Unixes
+  that provide this POSIX function.
+
+======================================================================
+
     Major changes between "nagios-plugins-uptime" versions 6 and 7
 
 * Fix build errors on OpenBSD.
