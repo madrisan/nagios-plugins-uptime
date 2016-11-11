@@ -80,8 +80,8 @@ static const char *program_copyright =
 static char buf[BUFSIZE + 1];
 static char result_line[BUFSIZE + 1], perfdata_line[BUFSIZE + 1];
 
-double uptime (void);
-char *sprint_uptime (double);
+time_t uptime (void);
+char *sprint_uptime (time_t);
 
 static void __attribute__ ((__noreturn__)) print_version (void)
 {
@@ -134,7 +134,7 @@ Where:\n\
 /* assume uptime never be zero seconds in practice */
 #define UPTIME_RET_FAIL  0
 
-double
+time_t
 uptime ()
 {
 #if defined(HAVE_STRUCT_SYSINFO_WITH_UPTIME)	/* Linux */
@@ -147,7 +147,7 @@ uptime ()
       return UPTIME_RET_FAIL;
     }
 
-  return info.uptime;
+  return (time_t) info.uptime;
 
 #elif defined(HAVE_FUNCTION_SYSCTL_KERN_BOOTTIME)	/* FreeBSD */
 
@@ -201,7 +201,7 @@ uptime ()
       perfstat_cpu_total (NULL, &ps_cpu_total, sizeof (ps_cpu_total), 1))
     return UPTIME_RET_FAIL;
 
-  return ((double) ps_cpu_total.lbolt / herz);
+  return ps_cpu_total.lbolt / herz;
 
 #elif defined(HAVE_CLOCK_GETTIME_MONOTONIC) /* POSIX.1-2001 */
 
@@ -221,16 +221,16 @@ uptime ()
 }
 
 char *
-sprint_uptime (double uptime_secs)
+sprint_uptime (time_t uptime_secs)
 {
-  int upminutes, uphours, updays;
+  unsigned int upminutes, uphours, updays;
   int pos = 0;
 
-  updays = (int) uptime_secs / (60 * 60 * 24);
+  updays = (unsigned int) (uptime_secs / (60 * 60 * 24));
   if (updays)
     pos +=
-      snprintf (buf, BUFSIZE, "%d day%s ", updays, (updays != 1) ? "s" : "");
-  upminutes = (int) uptime_secs / 60;
+      snprintf (buf, BUFSIZE, "%u day%s ", updays, (updays != 1) ? "s" : "");
+  upminutes = (unsigned int) (uptime_secs / 60);
   uphours = upminutes / 60;
   uphours = uphours % 24;
   upminutes = upminutes % 60;
@@ -238,11 +238,11 @@ sprint_uptime (double uptime_secs)
   if (uphours)
     {
       pos +=
-	snprintf (buf + pos, BUFSIZE - pos, "%d hour%s %d min", uphours,
+	snprintf (buf + pos, BUFSIZE - pos, "%u hour%s %u min", uphours,
 		  (uphours != 1) ? "s" : "", upminutes);
     }
   else
-    pos += snprintf (buf + pos, BUFSIZE - pos, "%d min", upminutes);
+    pos += snprintf (buf + pos, BUFSIZE - pos, "%u min", upminutes);
 
   return buf;
 }
@@ -250,9 +250,10 @@ sprint_uptime (double uptime_secs)
 int
 main (int argc, char **argv)
 {
-  int c, uptime_mins, status;
+  int c, status;
   char *critical = NULL, *warning = NULL;
-  double uptime_secs;
+  time_t uptime_secs;
+  unsigned int uptime_mins;
   thresholds *my_threshold = NULL;
 
   while ((c = getopt_long (argc, argv, "c:w:hV", longopts, NULL)) != -1)
@@ -283,7 +284,7 @@ main (int argc, char **argv)
 
   if (UPTIME_RET_FAIL != (uptime_secs = uptime ()))
     {
-      uptime_mins = (int) uptime_secs / 60;
+      uptime_mins = (unsigned int) (uptime_secs / 60);
       status = get_status (uptime_mins, my_threshold);
       free (my_threshold);
 
@@ -302,7 +303,7 @@ main (int argc, char **argv)
 
       snprintf (result_line + c, BUFSIZE - c, " %s",
 		sprint_uptime (uptime_secs));
-      snprintf (perfdata_line, BUFSIZE, "uptime=%d", uptime_mins);
+      snprintf (perfdata_line, BUFSIZE, "uptime=%u", uptime_mins);
 
       printf ("%s|%s\n", result_line, perfdata_line);
     }
