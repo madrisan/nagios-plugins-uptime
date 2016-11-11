@@ -190,18 +190,16 @@ uptime ()
 
 #elif defined(HAVE_LIBPERFSTAT)	/* AIX */
 
-  long herz = 0;
+  long ticks = 0;
   perfstat_cpu_total_t ps_cpu_total;
 
-  herz = sysconf (_SC_CLK_TCK);
-  /* make sure we do not divide by 0 */
-  assert (herz);
+  ticks = sysconf (_SC_CLK_TCK);
 
   if (-1 ==
       perfstat_cpu_total (NULL, &ps_cpu_total, sizeof (ps_cpu_total), 1))
     return UPTIME_RET_FAIL;
 
-  return ps_cpu_total.lbolt / herz;
+  return ps_cpu_total.lbolt / ticks;
 
 #elif defined(HAVE_CLOCK_GETTIME_MONOTONIC) /* POSIX.1-2001 */
 
