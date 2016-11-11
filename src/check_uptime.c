@@ -190,16 +190,18 @@ uptime ()
 
 #elif defined(HAVE_LIBPERFSTAT)	/* AIX */
 
-  long ticks = 0;
+  long hertz = 0;
   perfstat_cpu_total_t ps_cpu_total;
 
-  ticks = sysconf (_SC_CLK_TCK);
+  // get the number of clock ticks per second
+  hertz = sysconf (_SC_CLK_TCK);
 
   if (-1 ==
       perfstat_cpu_total (NULL, &ps_cpu_total, sizeof (ps_cpu_total), 1))
     return UPTIME_RET_FAIL;
 
-  return ps_cpu_total.lbolt / ticks;
+  // lbolt contains the number of ticks since last reboot
+  return ps_cpu_total.lbolt / hertz;
 
 #elif defined(HAVE_CLOCK_GETTIME_MONOTONIC) /* POSIX.1-2001 */
 
